@@ -11,6 +11,13 @@ set -e
 
 echo "Installing GitHub Copilot CLI..."
 
+# Detect Termux environment
+TERMUX_PREFIX="/data/data/com.termux/files/usr"
+IS_TERMUX=false
+if [ -n "${TERMUX_VERSION:-}" ] || [ -d "/data/data/com.termux" ]; then
+  IS_TERMUX=true
+fi
+
 # Detect platform
 case "$(uname -s || echo "")" in
   Darwin*) PLATFORM="darwin" ;;
@@ -115,7 +122,10 @@ if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
 fi
 
 # Check if running as root, fallback to non-root
-if [ "$(id -u 2>/dev/null || echo 1)" -eq 0 ]; then
+# In Termux, $PREFIX is already set to the Termux prefix; use it directly when available
+if [ "$IS_TERMUX" = true ]; then
+  PREFIX="${PREFIX:-$TERMUX_PREFIX}"
+elif [ "$(id -u 2>/dev/null || echo 1)" -eq 0 ]; then
   PREFIX="${PREFIX:-/usr/local}"
 else
   PREFIX="${PREFIX:-$HOME/.local}"
@@ -123,7 +133,11 @@ fi
 INSTALL_DIR="$PREFIX/bin"
 if ! mkdir -p "$INSTALL_DIR"; then
   echo "Error: Could not create directory $INSTALL_DIR. You may not have write permissions." >&2
-  echo "Try running this script with sudo or set PREFIX to a directory you own (e.g., export PREFIX=\$HOME/.local)." >&2
+  if [ "$IS_TERMUX" = true ]; then
+    echo "Set PREFIX to a directory you own (e.g., export PREFIX=\$HOME/.local)." >&2
+  else
+    echo "Try running this script with sudo or set PREFIX to a directory you own (e.g., export PREFIX=\$HOME/.local)." >&2
+  fi
   exit 1
 fi
 

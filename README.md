@@ -28,6 +28,7 @@ We're still early in our journey, but with your feedback, we're rapidly iteratin
 - **Linux**
 - **macOS**
 - **Windows**
+- **Android (Termux)**
 
 ### Prerequisites
 
@@ -94,6 +95,21 @@ npm install -g @github/copilot
 ```bash
 npm install -g @github/copilot@prerelease
 ```
+
+
+Install in [Termux](https://termux.dev) (Android):
+
+```bash
+curl -fsSL https://gh.io/copilot-install | bash
+```
+
+Or
+
+```bash
+wget -qO- https://gh.io/copilot-install | bash
+```
+
+The script automatically detects the Termux environment and installs the binary to `$PREFIX/bin` (Termux's default prefix). No `sudo` is required or supported in Termux.
 
 
 ### Launching the CLI
